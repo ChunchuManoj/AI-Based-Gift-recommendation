@@ -54,5 +54,122 @@ Welcome to the **Gift Recommendation Platform**, an AI-powered application desig
    ```bash
    git clone https://github.com/your-repo/gift-recommendation-platform.git
    cd gift-recommendation-platform
+   ```
 
-Install dependencies:
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+
+3. Set up environment variables (see Environment Variables).
+
+4. Run the development server:
+   ```bash
+   pnpm dev
+   ```
+
+5. Open the application in your browser:
+   ```
+   http://localhost:3000
+   ```
+
+---
+
+## Environment Variables
+
+Create a `.env.local` file in the root directory and add the following variables:
+
+```env
+# MongoDB
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/<database>?retryWrites=true&w=majority
+
+# Authentication
+NEXTAUTH_SECRET=your-nextauth-secret
+JWT_SECRET=your-jwt-secret
+
+# Gemini API
+GEMINI_API_KEY=your-gemini-api-key
+```
+
+---
+
+## Folder Structure
+
+```
+gift-recommendation-platform/
+├── app/                     # Next.js app directory
+│   ├── api/                 # API routes
+│   ├── components/          # Reusable UI components
+│   ├── context/             # React Context for global state
+│   ├── styles/              # Global CSS and Tailwind configuration
+│   ├── pages/               # Static and dynamic pages
+├── lib/                     # Utility functions and API integrations
+├── public/                  # Static assets
+├── types/                   # TypeScript type definitions
+├── .env.local               # Environment variables
+├── tailwind.config.js       # Tailwind CSS configuration
+├── pnpm-lock.yaml           # Dependency lock file
+└── README.md                # Project documentation
+```
+
+---
+
+## Usage
+
+### User Features
+
+- **Survey**: Users can fill out a survey to provide details about the gift recipient.
+- **Recommendations**: View AI-generated gift suggestions based on survey data.
+- **Save Gifts**: Save favorite gift ideas for later reference.
+- **Profile Management**: Update user profile and preferences.
+
+### Admin Features
+
+- **Dashboard**: View platform statistics and manage users.
+- **Gift Management**: Oversee and manage gift recommendations.
+
+---
+
+## API Endpoints
+
+### Authentication
+
+- `POST /api/auth/login`: User login.
+- `POST /api/auth/register`: User registration.
+- `GET /api/auth/me`: Get current user details.
+
+### Recommendations
+
+- `POST /api/recommendations`: Generate gift recommendations.
+
+### Admin
+
+- `GET /api/admin/users`: Fetch all users (admin only).
+- `GET /api/admin/stats`: Fetch platform statistics (admin only).
+
+---
+
+## Contributing
+
+We welcome contributions! To contribute:
+
+1. Fork the repository.
+2. Create a new branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -m "Add your message here"
+   ```
+4. Push to your branch:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+5. Create a Pull Request.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
