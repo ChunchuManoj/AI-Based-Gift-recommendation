@@ -15,7 +15,7 @@ export function Providers({
 }) {
   return (
     <SessionProvider session={session}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem >
         <SurveyProvider>{children}</SurveyProvider>
       </ThemeProvider>
     </SessionProvider>
