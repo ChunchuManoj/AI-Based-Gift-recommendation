@@ -34,30 +34,7 @@ export default function GiftDetailPage() {
             setSaved(isGiftSaved(data.gift.id))
           }
         } else {
-          // If gift not found in database, try to use mock data
-          // This is a fallback for demonstration purposes
-          const mockGift: Gift = {
-            id: params.id as string,
-            name: "Bestselling Mystery Novel Collection",
-            description:
-              "A collection of the top 3 bestselling mystery novels of the year, perfect for someone who loves reading and mysteries. Each book has been carefully selected to provide hours of entertainment and intrigue.",
-            price: 45.99,
-            image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800",
-            category: "Books",
-            tags: ["Reading", "Mystery", "Creative"],
-            rating: 4.8,
-            reviews: 124,
-            url: "#",
-            reason:
-              "Based on their love for reading and mystery novels, this collection would be perfect for them to enjoy. The selection includes a variety of mystery sub-genres to keep them engaged and entertained.",
-          }
-
-          setGift(mockGift)
-
-          // Check if this gift is saved
-          if (mockGift.id) {
-            setSaved(isGiftSaved(mockGift.id))
-          }
+          console.error("Gift not found")
         }
       } catch (error) {
         console.error("Error fetching gift details:", error)
@@ -146,7 +123,7 @@ export default function GiftDetailPage() {
             />
           ) : (
             <div className="h-full w-full flex items-center justify-center">
-              <div className="text-3xl font-bold text-muted-foreground">{gift.category}</div>
+              <p>No Image Available</p>
             </div>
           )}
         </div>
@@ -169,7 +146,6 @@ export default function GiftDetailPage() {
           </div>
 
           <div className="text-2xl font-bold mb-4">₹{Math.round(gift.price).toLocaleString("en-IN")}</div>
-
           <p className="text-muted-foreground mb-6">{gift.description}</p>
 
           <div className="mb-6">
@@ -241,22 +217,6 @@ export default function GiftDetailPage() {
                   </div>
                   <p className="text-sm text-muted-foreground mb-1">by Jane D. on March 12, 2025</p>
                   <p>Bought this as a birthday gift and they absolutely loved it! The quality was excellent.</p>
-                </div>
-
-                <div>
-                  <div className="flex items-center mb-1">
-                    <div className="flex mr-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${i < 4 ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`}
-                        />
-                      ))}
-                    </div>
-                    <span className="font-medium">Great value</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-1">by Michael T. on February 28, 2025</p>
-                  <p>The collection was well curated and arrived in perfect condition. Would recommend!</p>
                 </div>
               </div>
             </TabsContent>
