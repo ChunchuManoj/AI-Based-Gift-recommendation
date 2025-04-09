@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb"
 
-const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/giftgenius"
+const uri = process.env.MONGODB_URI || "mongodb+srv://chunchumanoj321:manoj123@cluster0.zpfigvp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 const options = {}
 
 let client
