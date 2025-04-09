@@ -1,11 +1,14 @@
-"use client"
+"use client";
 
-import { ThemeProvider as NextThemesProvider } from "next-themes"
-// ❌ This will fail in 0.2.1
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-export function ThemeProvider({
-  children,
-  ...props
-}: React.PropsWithChildren<any>) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+interface ThemeProviderProps {
+  children: React.ReactNode;
+  attribute?: string;
+  defaultTheme?: string;
+  enableSystem?: boolean;
+}
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }
