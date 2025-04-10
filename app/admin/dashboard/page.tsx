@@ -1,91 +1,147 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useSession } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useRouter } from "next/navigation"
-import { signOut } from "next-auth/react"
-import type { Gift } from "@/types/gift"
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
+import type { Gift } from "@/types/gift";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface User {
-  _id: string
-  name: string
-  email: string
-  role: string
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  isEditing?: boolean;
 }
 
 interface Stats {
-  total: number
-  today: number
-  monthly: number
+  total: number;
+  today: number;
+  monthly: number;
 }
 
 export default function AdminDashboard() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [users, setUsers] = useState<User[]>([])
-  const [gifts, setGifts] = useState<Gift[]>([])
-  const [stats, setStats] = useState<Stats>({ total: 0, today: 0, monthly: 0 })
-  const [loading, setLoading] = useState(true)
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [users, setUsers] = useState<User[]>([]);
+  const [gifts, setGifts] = useState<Gift[]>([]);
+  const [stats, setStats] = useState<Stats>({ total: 0, today: 0, monthly: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is admin
     if (status === "authenticated") {
       if (session?.user?.role !== "admin") {
-        router.push("/")
-        return
+        router.push("/");
+        return;
       }
 
       // Fetch data
-      fetchData()
+      fetchData();
     } else if (status === "unauthenticated") {
-      router.push("/admin/login")
+      router.push("/admin/login");
     }
-  }, [session, status, router])
+  }, [session, status, router]);
 
   const fetchData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       // Fetch users
-      const usersResponse = await fetch("/api/admin/users")
+      const usersResponse = await fetch("/api/admin/users");
       if (usersResponse.ok) {
-        const usersData = await usersResponse.json()
-        setUsers(usersData.users)
+        const usersData = await usersResponse.json();
+        setUsers(usersData.users);
       }
 
       // Fetch gifts
-      const giftsResponse = await fetch("/api/admin/gifts")
+      const giftsResponse = await fetch("/api/admin/gifts");
       if (giftsResponse.ok) {
-        const giftsData = await giftsResponse.json()
-        setGifts(giftsData.gifts)
+        const giftsData = await giftsResponse.json();
+        setGifts(giftsData.gifts);
       }
 
       // Fetch stats
-      const statsResponse = await fetch("/api/admin/stats")
+      const statsResponse = await fetch("/api/admin/stats");
       if (statsResponse.ok) {
-        const statsData = await statsResponse.json()
-        setStats(statsData.stats)
+        const statsData = await statsResponse.json();
+        setStats(statsData.stats);
       }
     } catch (error) {
-      console.error("Error fetching admin data:", error)
+      console.error("Error fetching admin data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleLogout = async () => {
-    await signOut({ redirect: false })
-    router.push("/admin/login")
-  }
+    await signOut({ redirect: false });
+    router.push("/admin/login");
+  };
+
+  const handleEditClick = (userId: string) => {
+    setUsers(
+      users.map((user) =>
+        user._id === userId
+          ? { ...user, isEditing: true }
+          : { ...user, isEditing: false }
+      )
+    );
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    try {
+      const response = await fetch("/api/admin/users/change-role", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, newRole }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to change role");
+      }
+
+      // Update local state
+      setUsers(
+        users.map((user) =>
+          user._id === userId
+            ? { ...user, role: newRole, isEditing: false }
+            : user
+        )
+      );
+
+      toast.success("User role updated successfully");
+    } catch (error: any) {
+      console.error("Error changing role:", error);
+      toast.error(error.message || "Failed to change role");
+    }
+  };
 
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p>Loading...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -179,17 +235,34 @@ export default function AdminDashboard() {
                           <td className="py-3 px-4">{user.name}</td>
                           <td className="py-3 px-4">{user.email}</td>
                           <td className="py-3 px-4">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs ${
-                                user.role === "admin" ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
-                              }`}
-                            >
-                              {user.role}
-                            </span>
+                            {user.isEditing ? (
+                              <Select
+                                value={user.role}
+                                onValueChange={(value) =>
+                                  handleRoleChange(user._id, value)
+                                }
+                              >
+                                <SelectTrigger className="w-[100px]">
+                                  <SelectValue placeholder="Select role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="user">User</SelectItem>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <span className="px-2 py-1 rounded-full text-sm font-medium bg-muted">
+                                {user.role}
+                              </span>
+                            )}
                           </td>
                           <td className="py-3 px-4 text-right">
-                            <Button variant="ghost" size="sm">
-                              Edit
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditClick(user._id)}
+                            >
+                              {user.isEditing ? "Save" : "Edit"}
                             </Button>
                           </td>
                         </tr>
@@ -223,7 +296,9 @@ export default function AdminDashboard() {
                         <tr key={gift.id} className="border-b">
                           <td className="py-3 px-4">{gift.name}</td>
                           <td className="py-3 px-4">{gift.category}</td>
-                          <td className="py-3 px-4">${gift.price.toFixed(2)}</td>
+                          <td className="py-3 px-4">
+                            ${gift.price.toFixed(2)}
+                          </td>
                           <td className="py-3 px-4 text-right">
                             <Button variant="ghost" size="sm">
                               Edit
@@ -240,6 +315,5 @@ export default function AdminDashboard() {
         </Tabs>
       </main>
     </div>
-  )
+  );
 }
-
