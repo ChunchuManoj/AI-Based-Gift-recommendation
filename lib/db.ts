@@ -16,10 +16,25 @@ export async function saveUser(userData: any) {
 }
 
 export async function findUserByEmail(email: string) {
-  const client = await clientPromise;
-  const db = client.db();
+  try {
+    console.log("Searching for user with email:", email);
+    const client = await clientPromise;
+    const db = client.db();
 
-  return db.collection(USERS_COLLECTION).findOne({ email });
+    // Convert email to lowercase for case-insensitive search
+    const normalizedEmail = email.toLowerCase().trim();
+    console.log("Normalized email:", normalizedEmail);
+
+    const user = await db.collection(USERS_COLLECTION).findOne({
+      email: { $regex: new RegExp(`^${normalizedEmail}$`, "i") },
+    });
+
+    console.log("User found:", user ? "Yes" : "No");
+    return user;
+  } catch (error) {
+    console.error("Error in findUserByEmail:", error);
+    throw error;
+  }
 }
 
 export async function updateUser(userId: string, updateData: any) {
